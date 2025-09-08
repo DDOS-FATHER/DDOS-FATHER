@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NATIONAL CYBER COMMUNITY</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: monospace;
+      background: black;
+      overflow: hidden;
+    }
+
+    /* Login Screen */
+    #loginScreen {
+      position: absolute;
+      top:0; left:0;
+      width:100%; height:100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: red;
+      text-align: center;
+      background: linear-gradient(135deg, black, darkred);
+      animation: bgPulse 8s infinite alternate;
+    }
+    @keyframes bgPulse {
+      from { background: linear-gradient(135deg, black, darkred); }
+      to { background: linear-gradient(135deg, darkred, black); }
+    }
+    h1 { font-size: 42px; text-shadow: 0 0 20px red, 0 0 30px black; animation: glow 2s infinite alternate; margin: 5px; }
+    @keyframes glow {
+      from { text-shadow: 0 0 5px red; }
+      to { text-shadow: 0 0 25px red, 0 0 35px black; }
+    }
+    h2 { font-size: 20px; color: #ff6666; text-shadow: 0 0 5px red; margin-bottom:20px; }
+
+    .input-box { margin: 10px auto; width: 250px; }
+    input {
+      width: 100%; padding:10px;
+      background:black; border:1px solid red;
+      color:red; text-align:center; font-size:16px;
+      border-radius:5px; outline:none; box-shadow:0 0 8px red;
+      text-shadow:0 0 10px red;
+      transition:0.2s all;
+    }
+    input:focus { box-shadow:0 0 15px red,0 0 25px darkred; }
+
+    input::placeholder { color:red; opacity:0.7; }
+
+    button {
+      margin-top:15px;
+      padding:10px 25px;
+      background: darkred;
+      border:1px solid red;
+      color:white;
+      font-size:16px;
+      cursor:pointer;
+      border-radius:8px;
+      text-shadow:0 0 5px black;
+      box-shadow:0 0 10px red;
+      transition: all 0.2s ease-in-out;
+    }
+    button:hover { background:red; transform: scale(1.05); box-shadow:0 0 20px red; }
+
+    .warning {
+      margin-top: 20px;
+      font-size: 15px;
+      color: #ff3333;
+      text-shadow: 0 0 10px red;
+      min-height: 24px;
+    }
+    .locked { animation: blink 0.8s infinite, shake 0.5s; }
+    @keyframes blink {
+      0%, 100% { color: red; }
+      50% { color: black; }
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+
+    .ip-box {
+      margin-top: 30px;
+      font-size: 18px;
+      color: #ff8080;
+      text-shadow: 0 0 15px black;
+    }
+
+    /* Unlock Screen */
+    #unlockScreen {
+      position: absolute;
+      top:0; left:0;
+      width:100%; height:100%;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background:black;
+      color: lime;
+      text-shadow: 0 0 15px lime, 0 0 25px green;
+      overflow: hidden;
+    }
+    #unlockScreen h1 { font-size: 40px; margin-bottom: 20px; }
+
+    .typewriter {
+      font-size: 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid lime;
+      width: 0;
+      animation: typing 4s steps(40, end) forwards, blink-caret 0.8s infinite;
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    @keyframes blink-caret {
+      0%, 100% { border-color: transparent; }
+      50% { border-color: lime; }
+    }
+
+    /* Matrix code canvas */
+    #matrixCanvas {
+      position:absolute;
+      top:0; left:0;
+      width:100%; height:100%;
+      z-index:0;
+    }
+
+    @media (max-width: 500px) {
+      h1 { font-size: 28px; }
+      h2 { font-size: 16px; }
+      .input-box { width: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrixCanvas"></canvas>
+
+  <div id="loginScreen">
+    <h1>NATIONAL CYBER COMMUNITY</h1>
+    <h2>Login</h2>
+    <div class="input-box">
+      <input id="username" type="text" placeholder="username">
+    </div>
+    <div class="input-box">
+      <input id="password" type="password" placeholder="password">
+    </div>
+    <button onclick="checkLogin()">Login</button>
+
+    <div class="warning" id="message">
+      If our demands are not met, it will be even more dangerous.
+    </div>
+
+    <div class="ip-box" id="ipAddress">
+      Detecting your IP...
+    </div>
+  </div>
+
+  <div id="unlockScreen">
+    <h1>✅ ACCESS GRANTED ✅</h1>
+    <p class="typewriter">Welcome to the system. All channels unlocked...</p>
+    <div class="ip-box" id="ipAddress2"></div>
+  </div>
+
+  <script>
+    // Demo credentials
+    const correctUser = "DDOS-BOSS";
+    const correctPass = "abdul awal";
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    function checkLogin() {
+      const msg = document.getElementById('message');
+      if (attempts >= maxAttempts) {
+        msg.innerText = "❌ Your access is LOCKED.";
+        msg.classList.add("locked");
+        return;
+      }
+
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+
+      if (user === correctUser && pass === correctPass) {
+        document.getElementById('loginScreen').style.display = "none";
+        document.getElementById('unlockScreen').style.display = "flex";
+        document.getElementById('ipAddress2').innerText = document.getElementById('ipAddress').innerText;
+      } else {
+        attempts++;
+        if (attempts >= maxAttempts) {
+          msg.innerText = "❌ Too many attempts. Your access is LOCKED.";
+          msg.classList.add("locked");
+        } else {
+          msg.innerText = "❌ Wrong credentials. Attempts left: " + (maxAttempts - attempts);
+          msg.classList.add("locked");
+          setTimeout(()=>{ msg.classList.remove("locked"); },800);
+        }
+      }
+    }
+
+    // Fetch Real IP
+    fetch('https://api64.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('ipAddress').innerText = "Your IP: " + data.ip;
+      })
+      .catch(()=>{ document.getElementById('ipAddress').innerText = "IP detect failed."; });
+
+    // Matrix effect
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%';
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+    for (let x = 0; x < columns; x++) drops[x] = 1;
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0,0,0,0.05)';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#0F0';
+      ctx.font = fontSize + 'px monospace';
+      for(let i=0; i<drops.length; i++){
+        const text = letters.charAt(Math.floor(Math.random()*letters.length));
+        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+        if(drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i]=0;
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 50);
+    window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+  </script>
+</body>
+</html>
